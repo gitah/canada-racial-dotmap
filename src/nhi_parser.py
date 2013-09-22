@@ -130,7 +130,7 @@ def parse_cencus_tract_info(rows):
     info.white = info.total_population - info.count_non_white
     return info
 
-def parse_nhi_csv(file_path):
+def parse_nhi_file(file_path):
     ct_map = {}
 
     with open(file_path) as csv_file:
@@ -168,6 +168,6 @@ def parse_nhi_csv(file_path):
 
 ## Main ##
 if __name__ == "__main__":
-    CSV_FILE = "nhi-bc.csv"
-    m = parse_nhi_csv(CSV_FILE)
+    CSV_FILE = "data/nhi-bc.csv"
+    m = parse_nhi_file(CSV_FILE)
     import ipdb; ipdb.set_trace()
