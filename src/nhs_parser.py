@@ -130,7 +130,7 @@ def parse_cencus_tract_info(rows):
     info.white = info.total_population - info.count_non_white
     return info
 
-def parse_nhi_file(file_path):
+def parse_nhs_file(file_path):
     ct_map = {}
 
     with open(file_path) as csv_file:

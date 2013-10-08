@@ -7,31 +7,27 @@ The dot will have the following info:
     b) Color (representing the race)
     c) Quadkey (indicates which google maps tile we need)
 """
+import sqllite3
+
 import shapefile
 
-import nhi_parser
-import census_parser
+from nhs_parser import parse_nhs_file
+from census_parser import parse_census_file
+from shapefile_parser import parse_shapefile_file
 
 SHAPEFILE = "data/dblocks.shp"
 
-DBUID_FIELD = 0
-CTUID_FIELD = 24
+def generate_dots(shape_file, nhs_file, census_file, outfile)
 
-def draw_dots(shape_file, nhi_file, census_file)
-    ctrack_demo = parse_nhi_file(nhi_file)
-    dblock_pop = parse_census_file(census_file)
-    sf = shapefile.Reader(shape_file)
-    shape_recs = sf.shapeRecords()
+    outfile_fp = open(outfile, 'w')
 
-    for sr in shape_recs:
-        rec = sr.record
-        shape = sr.shape
+    ct_to_demo = parse_nhs_file(nhs_file)
+    dblock_to_pop = parse_census_file(census_file)
+    dblock_to_shape = parse_shapefile_file(shape_file)
 
-        dblock_id = rec[DBUID_FIELD]
-        ctrack_id = rec[CTUID_FIELD]
-
-        demo = ctrack_demo[ctrack_id]
-        dlbock_pop = dblock_pops[dblock_id]
+    for dblock_id, shape in dblock_to_shape:
+        pop, ctrack_id = dblock_to_pop[dblock_id]
+        demo = ct_to_demo[ctrack_id]
         
         ratios = {
                 "east_asian" : demo.ratio_east_asian,
@@ -42,13 +38,13 @@ def draw_dots(shape_file, nhi_file, census_file)
                 "aboriginal" : demo.ratio_aboriginal,
                 "white" : demo.ratio_white,
         }
-        draw_dblock_dots(shape, pop, ratios) 
 
+        dblock_dots = generate_dblock_dots(dblock_shape, dblock_pop, dblock_demo_ratios) 
+        write_dots_to_db(dblock_dots, outfile_fp)
 
-def draw_dblock_dots(shape, pop, ratios):
-    """
-        1. 
-    """
+    outfile_fp.close()
+
+def generate_dblock_dots(shape, pop, ratios):
     DOT_COLORS = {
             "east_asian" : "red",
             "black" : "green",
@@ -60,10 +56,17 @@ def draw_dblock_dots(shape, pop, ratios):
     }
     dot_counts = {k:int(v*pop) for k,v in ratios}
 
+    dots = []
     for demographic,count in dot_counts.item():
         for i in range(count):
-            # 1) generate random (lat,lng) within bound of shape
-                # 1.5) compute gmaps quadkey from (lat,lng)
-            # 2) create dot (lat, lng, color, quadkey)
-            # 3) write dot as row in sqllite
-            pass
+            lat,lng = generate_random_point(shape)
+            dot_color = DOT_COLORS[demographic]
+            dots.append( (lat,lng,dot_color)
+    return dots
+
+def init_out_file(outfile):
+    return 
+
+def write_dots(dots, outfile_fp):
+    dotstr = "%s %s %s" % (lat lng quadkey)
+    outfile_fp.write(dotstr)
